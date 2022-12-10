@@ -1,5 +1,5 @@
 pytest
-certifi==2022.12.7
+certifi
 charset-normalizer==2.1.1
 colorama==0.4.6
 fire==0.4.0
