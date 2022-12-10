@@ -52,3 +52,7 @@ Werkzeug==2.2.2
 wheel==0.38.4
 wrapt==1.14.1
 fire==0.4.0
+tensorboard==2.11.0
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.1
+tensorboardX==2.5.1
