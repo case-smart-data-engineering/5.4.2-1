@@ -10,6 +10,8 @@ from torch import nn
 
 from .config import config
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 class SiameseAlexNet(nn.Module):
     def __init__(self, gpu_id, train=True):
         super(SiameseAlexNet, self).__init__()
@@ -33,13 +35,17 @@ class SiameseAlexNet(nn.Module):
         self.corr_bias = nn.Parameter(torch.zeros(1))
         if train:
             gt, weight = self._create_gt_mask((config.train_response_sz, config.train_response_sz))
-            with torch.cuda.device(gpu_id):
-                self.train_gt = torch.from_numpy(gt).cuda()
-                self.train_weight = torch.from_numpy(weight).cuda()
+            with torch.device("cuda" if torch.cuda.is_available() else "cpu"):
+                self.train_gt = torch.from_numpy(gt).to(device)
+                self.train_weight = torch.from_numpy(weight).to(device)
             gt, weight = self._create_gt_mask((config.response_sz, config.response_sz))
-            with torch.cuda.device(gpu_id):
-                self.valid_gt = torch.from_numpy(gt).cuda()
-                self.valid_weight = torch.from_numpy(weight).cuda()
+            #with torch.cuda.device(gpu_id):
+                #self.valid_gt = torch.from_numpy(gt).to(device)
+                #self.valid_weight = torch.from_numpy(weight).to(device)
+
+            self.valid_gt = torch.from_numpy(gt).to(device)
+            self.valid_weight = torch.from_numpy(weight).to(device)
+
         self.exemplar = None
         self.gpu_id = gpu_id
 
@@ -101,3 +107,4 @@ class SiameseAlexNet(nn.Module):
         weights[mask == 0] = 0.5 / np.sum(mask == 0)
         mask = np.repeat(mask, config.train_batch_size, axis=0)[:, np.newaxis, :, :]
         return mask.astype(np.float32), weights.astype(np.float32)
+

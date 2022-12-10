@@ -14,15 +14,22 @@ from .custom_transforms import ToTensor
 from .utils import get_exemplar_image, get_pyramid_instance_image, get_instance_image
 
 torch.set_num_threads(1) # otherwise pytorch will take all cpus
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class SiamFCTracker:
     def __init__(self, model_path, gpu_id):
         self.gpu_id = gpu_id
-        with torch.cuda.device(gpu_id):
-            self.model = SiameseAlexNet(gpu_id, train=False)
-            self.model.load_state_dict(torch.load(model_path))
-            self.model = self.model.cuda()
-            self.model.eval() 
+        #with torch.cuda.device(gpu_id):
+            #self.model = SiameseAlexNet(gpu_id, train=False)
+            #self.model.load_state_dict(torch.load(model_path))
+            #self.model = self.model.to(device)
+            #self.model.eval() 
+
+        self.model = SiameseAlexNet(gpu_id, train=False)
+        self.model.load_state_dict(torch.load(model_path))
+        self.model = self.model.to(device)
+        self.model.eval()
+
         self.transforms = transforms.Compose([
             ToTensor()
         ])
@@ -52,9 +59,12 @@ class SiamFCTracker:
 
         # get exemplar feature
         exemplar_img = self.transforms(exemplar_img)[None,:,:,:]
-        with torch.cuda.device(self.gpu_id):
-            exemplar_img_var = Variable(exemplar_img.cuda())
-            self.model((exemplar_img_var, None))
+        #with torch.cuda.device(gpu_id):
+            #exemplar_img_var = Variable(exemplar_img.to(device))
+            #self.model((exemplar_img_var, None))
+
+        exemplar_img_var = Variable(exemplar_img.to(device))
+        self.model((exemplar_img_var, None))
 
         self.penalty = np.ones((config.num_scale)) * config.scale_penalty
         self.penalty[config.num_scale//2] = 1
@@ -85,12 +95,19 @@ class SiamFCTracker:
         size_x_scales = self.s_x * self.scales
         pyramid = get_pyramid_instance_image(frame, self.pos, config.instance_size, size_x_scales, self.img_mean)
         instance_imgs = torch.cat([self.transforms(x)[None,:,:,:] for x in pyramid], dim=0)
-        with torch.cuda.device(self.gpu_id):
-            instance_imgs_var = Variable(instance_imgs.cuda())
-            response_maps = self.model((None, instance_imgs_var))
-            response_maps = response_maps.data.cpu().numpy().squeeze()
-            response_maps_up = [cv2.resize(x, (self.interp_response_sz, self.interp_response_sz), cv2.INTER_CUBIC)
-             for x in response_maps]
+        #with torch.cuda.device(gpu_id):
+            #instance_imgs_var = Variable(instance_imgs.to(device))
+            #response_maps = self.model((None, instance_imgs_var))
+            #response_maps = response_maps.data.cpu().numpy().squeeze()
+            #response_maps_up = [cv2.resize(x, (self.interp_response_sz, self.interp_response_sz), cv2.INTER_CUBIC)
+             #for x in response_maps]
+
+        instance_imgs_var = Variable(instance_imgs.to(device))
+        response_maps = self.model((None, instance_imgs_var))
+        response_maps = response_maps.data.cpu().numpy().squeeze()
+        response_maps_up = [cv2.resize(x, (self.interp_response_sz, self.interp_response_sz), cv2.INTER_CUBIC)
+          for x in response_maps]
+
         # get max score
         max_score = np.array([x.max() for x in response_maps_up]) * self.penalty
 
