@@ -16,7 +16,7 @@ a = []
 def main(video_dir, gpu_id, model_path):
     # 加载视频（图片组）
     filenames = sorted(glob.glob(os.path.join(video_dir, "*.jpg")),key=lambda x: int(os.path.basename(x).split('.')[0]))
-    print(filenames)
+    #print(filenames)
     frames = [cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGB) for filename in filenames]
     print(frames[1].shape)
 
