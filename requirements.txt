@@ -10,8 +10,8 @@ line-profiler==4.0.2
 lmdb==1.4.0
 MarkupSafe==2.1.1
 numpy==1.23.5
-opencv-contrib-python==4.6.0.66
 opencv-python-headless==4.6.0.66
+opencv-contrib-python==4.6.0.66
 pandas==1.5.2
 Pillow==9.3.0
 pip==22.3.1
@@ -35,3 +35,4 @@ tqdm==4.64.1
 typing_extensions==4.4.0
 urllib3==1.26.13
 wheel==0.38.4
+ipywidgets widgetsnbextension pandas-profiling
