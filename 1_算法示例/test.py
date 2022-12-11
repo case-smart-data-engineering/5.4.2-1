@@ -14,13 +14,10 @@ from siamfc import SiamFCTracker
 
 a = []
 def main(video_dir, gpu_id, model_path):
-    # load videos
-    # python bin/demo_siamfc.py --model_path models/siamfc_pretrained.pth --gpu-id 0 --video-dir e:/save_data/5.mp4
-    #print(video_dir)
+    # 加载视频（图片组）
     filenames = sorted(glob.glob(os.path.join(video_dir, "*.jpg")),key=lambda x: int(os.path.basename(x).split('.')[0]))
-    #print(filenames)
+    print(filenames)
     frames = [cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGB) for filename in filenames]
-    #print("111",frames)
     print(frames[1].shape)
 
     title = video_dir.split('/')[-1]
@@ -95,9 +92,9 @@ def main(video_dir, gpu_id, model_path):
         cv2.waitKey(1)
 if __name__ == "__main__":
     # 测试视频根目录
-    video_dir = r'./video/GOT-10k_Test_000009'
+    video_dir = r'./1_算法示例/video/GOT-10k_Test_000009'
     # 模型地址
     gpu_id = 0
-    model_path = './model/siamfc_pretrained.pth'
+    model_path = './1_算法示例/model/siamfc_pretrained.pth'
 
     main(video_dir, gpu_id, model_path)
