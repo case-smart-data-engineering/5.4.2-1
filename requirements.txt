@@ -33,4 +33,6 @@ tqdm==4.64.1
 typing_extensions==4.4.0
 urllib3==1.26.13
 wheel==0.38.4
-ipywidgets
+ipywidgets==8.0.3
+matplotlib==3.6.2
+opencv-python-headless==4.6.0.66
