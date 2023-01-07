@@ -72,7 +72,11 @@ def main(video_dir, gpu_id, model_path):
         #plt.imshow(frame)
     for index in range(0,len(result)):
         plt.imshow(result[index])
-        plt.show()    
+        plt.show()
+        image = result[index]
+        name = "test_result_"+str(index)+".jpg"
+        #image.save(name)
+        cv2.imwrite(name,image)    
         
 if __name__ == "__main__":
     # 测试视频根目录
